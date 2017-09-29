@@ -18,13 +18,13 @@ Firstly, run the following command to fetch all your forked repositories.
 
 ```sh
 $ cd src
-$ node fetch-repos.js
+$ node fetch-repos.js # Writes to a repos.json file.
 ```
 
-A JSON file containing an array of your repositories will be written into the same directory. Manually inspect it and remove the forked repositories that you want to keep. **The repositories that remain inside `repos.json` will be deleted on the next command. It is an irreversible operation. Use with great caution!**.
+A JSON file, `repos.json` containing an array of your repositories will be written into the same directory. Manually inspect it and remove the forked repositories that you want to keep. **The repositories that remain inside `repos.json` will be deleted on the next command. It is an irreversible operation. Use with great caution!**.
 
 ```sh
-$ node delete-repos.js
+$ node delete-repos.js # Reads from repos.json and deletes the repos inside it.
 ```
 
 And all the repositories within `repos.json` will be deleted! It's that easy.
