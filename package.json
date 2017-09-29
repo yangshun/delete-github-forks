@@ -1,0 +1,15 @@
+{
+  "name": "delete-github-forks",
+  "version": "0.1.0",
+  "description": "Delete your Github forks.",
+  "main": "fetch-repos.js",
+  "dependencies": {
+    "axios": "^0.16.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Yangshun Tay",
+  "license": "MIT"
+}
