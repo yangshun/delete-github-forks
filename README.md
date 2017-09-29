@@ -3,7 +3,13 @@ Delete GitHub Forks
 
 Delete your forked GitHub repositories easily in two steps.
 
+## Motivations
+
+Deleting GitHub repositories via the GitHub interface is a hassle; you have to enter your password followed by the name of the repository. This is not scalable if you contribute to open source a fair bit and have many forked repositories that you may not necessarily want to keep. Using this script, you can fetch a list of your GitHub repositories and delete the unwanted repositories in one go.
+
 ## Getting Started
+
+Clone this repository.
 
 ```
 $ npm install
