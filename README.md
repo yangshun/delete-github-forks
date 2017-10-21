@@ -16,7 +16,7 @@ $ npm install
 $ cp src/config.json.example src/config.json
 ```
 
-Create a personal GitHub token on [this page](https://github.com/settings/tokens/new) that has the following permissions: `public_repo` and `delete_repo` and add it to the copied `config.json`.
+Add your GitHub username and access token to `config.json`. To get the access token, go to [this page](https://github.com/settings/tokens/new) and create a token that has the following permissions: `public_repo` and `delete_repo`.
 
 ## Usage
 

@@ -2,9 +2,9 @@ const axios = require('axios');
 const fs = require('fs');
 const config = require('./config');
 
-const username = 'yangshun';
+const username = config.github_username;
 const URL = `https://api.github.com/users/${username}/repos`;
-const NUMBER_OF_PAGES = 8; // Total number of repos / page size of 30.
+const NUMBER_OF_PAGES = 8; // Your total number of repos / page size of 30. TODO: Remove hardcoding.
 
 async function fetchRepos(url) {
   const repos = [];
