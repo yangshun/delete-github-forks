@@ -13,11 +13,13 @@ function deleteRepos(repos) {
       params: {
         access_token: config.access_token,
       },
-    }).then(() => {
-      console.log(`${repo} deleted!`);
-    }).catch(() => {
-      console.error(`${repo} not found...`);
-    });
+    })
+      .then(() => {
+        console.log(`${repo} deleted!`);
+      })
+      .catch(() => {
+        console.error(`Error deleting ${repo}...`);
+      });
   });
 }
 
