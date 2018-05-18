@@ -6,7 +6,7 @@ const reposForDeletion = require('./repos');
 
 function deleteRepos(repos) {
   repos.forEach(async repo => {
-    const URL = `https://api.github.com/repos/${repo}`;
+    const URL = `${config.api_url}/repos/${repo}`;
     await axios({
       method: 'delete',
       url: URL,

@@ -3,7 +3,7 @@ const fs = require('fs');
 const config = require('./config');
 
 const username = config.github_username;
-const URL = `https://api.github.com/users/${username}/repos`;
+const URL = `${config.api_url}/users/${username}/repos`;
 
 async function fetchRepos(url) {
   const repos = [];
