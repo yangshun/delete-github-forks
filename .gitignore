@@ -58,5 +58,8 @@ typings/
 .env
 
 # Project-specific
-src/config.json
-src/repos.json
+config/config.js
+config/whitelist.json
+config/config.json
+history
+/reposForDeletion.json
