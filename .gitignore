@@ -60,3 +60,5 @@ typings/
 # Project-specific
 src/config.json
 src/repos.json
+deleted/repos*.json
+config.js
