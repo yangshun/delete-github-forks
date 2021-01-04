@@ -4,7 +4,7 @@
   "description": "Delete your Github forks.",
   "main": "fetch-repos.js",
   "dependencies": {
-    "axios": "^0.18.1"
+    "axios": "^0.21.1"
   },
   "devDependencies": {},
   "scripts": {
