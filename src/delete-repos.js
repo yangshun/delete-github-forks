@@ -7,12 +7,11 @@ const reposForDeletion = require('./repos');
 function deleteRepos(repos) {
   repos.forEach(async repo => {
     const URL = `${config.api_url}/repos/${repo}`;
-    await axios({
-      method: 'delete',
-      url: URL,
-      params: {
-        access_token: config.access_token,
-      },
+    await axios.delete(URL, {
+      headers: {
+        Accept: 'application/vnd.github.v3+json',
+        Authorization: `token ${config.access_token}`
+      }
     })
       .then(() => {
         console.log(`${repo} deleted!`);
