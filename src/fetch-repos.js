@@ -12,9 +12,11 @@ async function fetchRepos(url) {
   while (!stopFinding) {
     await axios
       .get(url, {
+        headers: {
+          Authorization: config.access_token
+        },
         params: {
-          page,
-          access_token: config.access_token,
+          page
         },
       })
       .then(res => {
