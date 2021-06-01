@@ -13,7 +13,8 @@ async function fetchRepos(url) {
     await axios
       .get(url, {
         headers: {
-          Authorization: config.access_token
+          Accept: 'application/vnd.github.v3+json',
+          Authorization: `token ${config.access_token}`
         },
         params: {
           page
