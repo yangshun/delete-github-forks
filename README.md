@@ -27,10 +27,10 @@ Firstly, run the following command to fetch all your forked repositories.
 $ npm run fetch-repos # Writes to a src/repos.json file
 ```
 
-A JSON file, `src/repos.json` containing an array of your repositories will be written into the same directory. Manually inspect it and remove the forked repositories that you want to keep. **The repositories that remain inside `repos.json` will be deleted on the next command. It is an irreversible operation. Use with great caution!**.
+A JSON file, `src/repos.json` containing an array of your repositories will be written into the same directory. Manually inspect it and remove the forked repositories that you want to keep. **The repositories that remain inside `src/repos.json` will be deleted on the next command. It is an irreversible operation. Use with great caution!**.
 
 ```sh
-$ npm run delete-repos # Reads from repos.json and deletes the repos inside it.
+$ npm run delete-repos # Reads from src/repos.json and deletes the repos inside it.
 ```
 
 And all the repositories within `src/repos.json` will be deleted! It's that easy.
