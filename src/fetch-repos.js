@@ -48,5 +48,5 @@ async function fetchRepos(url) {
 fetchRepos(URL).then(result => {
   console.log('Forked repos found:', result.length);
   console.log(result.join('\n'));
-  fs.writeFileSync('repos.json', JSON.stringify(result, null, 2));
+  fs.writeFileSync('src/repos.json', JSON.stringify(result, null, 2));
 });
