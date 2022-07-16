@@ -1,17 +1,17 @@
 {
   "name": "delete-github-forks",
   "version": "0.1.0",
-  "description": "Delete your Github forks.",
-  "main": "fetch-repos.js",
+  "author": "Yangshun Tay",
+  "description": "Delete your GitHub forks in bulk.",
+  "scripts": {
+    "fetch": "node src/fetchRepos.js",
+    "delete": "node src/deleteRepos.js"
+  },
   "dependencies": {
     "axios": "^0.21.2"
   },
-  "devDependencies": {},
-  "scripts": {
-    "fetch-repos": "node src/fetch-repos.js",	
-    "delete-repos": "node src/delete-repos.js",	
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "engines": {
+    "node": ">=12.0.0"
   },
-  "author": "Yangshun Tay",
   "license": "MIT"
 }

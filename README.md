@@ -1,12 +1,12 @@
 # Delete GitHub Forks
 
-Delete your forked GitHub repositories easily in two steps.
+Delete your forked GitHub repositories easily in two steps (takes less than 5 minutes).
 
-**Note:** Node 8+ is required because some new language features are used.
+## Motivation
 
-## Motivations
+Deleting GitHub repositories via the GitHub interface is a hassle; you have to enter your password followed by the name of the repository. This is not scalable if you contribute to open source a fair bit and have many forked repositories that you may not necessarily want to keep.
 
-Deleting GitHub repositories via the GitHub interface is a hassle; you have to enter your password followed by the name of the repository. This is not scalable if you contribute to open source a fair bit and have many forked repositories that you may not necessarily want to keep. Using this script, you can fetch a list of your GitHub repositories and delete the unwanted repositories in one go.
+Using these scripts, you can fetch a list of your GitHub repositories and delete all the unwanted repositories in one go.
 
 ## Getting Started
 
@@ -24,13 +24,13 @@ Add your GitHub username and access token to `config.json`. To get the access to
 Firstly, run the following command to fetch all your forked repositories.
 
 ```sh
-$ npm run fetch-repos # Writes to a src/repos.json file
+$ npm run fetch # Writes to a src/repos.json file
 ```
 
 A JSON file, `src/repos.json` containing an array of your repositories will be written into the same directory. Manually inspect it and remove the forked repositories that you want to keep. **The repositories that remain inside `src/repos.json` will be deleted on the next command. It is an irreversible operation. Use with great caution!**.
 
 ```sh
-$ npm run delete-repos # Reads from src/repos.json and deletes the repos inside it.
+$ npm run delete # Reads from src/repos.json and deletes the repos inside it.
 ```
 
 And all the repositories within `src/repos.json` will be deleted! It's that easy.
