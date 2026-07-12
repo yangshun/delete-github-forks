@@ -40,14 +40,14 @@ export function AuthSetup({
       </div>
       <div className="onboarding-grid">
         <article className="card setup-card setup-primary">
+          <span className="option-badge option-badge-recommended">
+            Recommended
+          </span>
           <div className="card-heading">
             <span className="option-number" aria-hidden="true">
               1
             </span>
-            <div>
-              <h3>Use GitHub CLI</h3>
-              <p>Recommended</p>
-            </div>
+            <h3>Use GitHub CLI</h3>
           </div>
           {!status.gh.installed ? (
             <>
@@ -62,7 +62,7 @@ export function AuthSetup({
                 Install GitHub CLI
               </a>
               <pre>
-                <code>{`gh auth login\ngh auth refresh -h github.com -s delete_repo`}</code>
+                <code>gh auth login -h github.com -s delete_repo --web</code>
               </pre>
             </>
           ) : !status.gh.authenticated ? (
@@ -78,7 +78,7 @@ export function AuthSetup({
                 , then run:
               </p>
               <pre>
-                <code>gh auth login</code>
+                <code>gh auth login -h github.com -s delete_repo --web</code>
               </pre>
             </>
           ) : (
@@ -108,14 +108,12 @@ export function AuthSetup({
         </article>
 
         <article className="card setup-card">
+          <span className="option-badge">Alternative</span>
           <div className="card-heading">
             <span className="option-number" aria-hidden="true">
               2
             </span>
-            <div>
-              <h3>Use an access token</h3>
-              <p>Alternative</p>
-            </div>
+            <h3>Use an access token</h3>
           </div>
           <p>
             Your token is sent only to this local server and kept in memory

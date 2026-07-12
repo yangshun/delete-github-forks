@@ -47,10 +47,15 @@ All options:
 
 ### GitHub CLI (recommended)
 
-The app automatically detects an authenticated [GitHub CLI](https://cli.github.com/) session. Sign in and grant repository deletion access once:
+The app automatically detects an authenticated [GitHub CLI](https://cli.github.com/) session. On a fresh computer, sign in and request repository deletion access in one step:
 
 ```sh
-gh auth login
+gh auth login -h github.com -s delete_repo --web
+```
+
+If you are already signed in without the required permission, add it to your existing session:
+
+```sh
 gh auth refresh -h github.com -s delete_repo
 ```
 

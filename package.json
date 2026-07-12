@@ -1,6 +1,6 @@
 {
   "name": "delete-github-forks",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "Yangshun Tay",
   "description": "Delete your GitHub forks in bulk.",
   "keywords": [

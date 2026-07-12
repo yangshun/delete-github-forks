@@ -123,25 +123,37 @@ h1 {
   color: #68726b;
 }
 .setup-card {
+  position: relative;
   padding: 28px;
-}
-.setup-primary {
-  border-color: #aac9b3;
+  border: 0;
+  box-shadow: none;
 }
 .card-heading {
   display: flex;
   align-items: center;
   gap: 12px;
   margin-bottom: 20px;
+  padding-right: 92px;
 }
 .card-heading h3 {
   margin: 0;
   font-size: 1.6rem;
   letter-spacing: -0.03em;
 }
-.card-heading p {
-  margin: 2px 0 0;
-  font-size: 0.82rem;
+.option-badge {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  color: #5c665f;
+  background: #eef1ef;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+.option-badge-recommended {
+  color: #27663a;
+  background: #e4f2e8;
 }
 .option-number {
   display: grid;
