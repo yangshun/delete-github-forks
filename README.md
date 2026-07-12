@@ -1,76 +1,107 @@
 # Delete GitHub Forks
 
-Delete your forked GitHub repositories easily in two steps (takes less than 5 minutes).
+A safe, local web app for reviewing and deleting GitHub forks in bulk.
 
-## Motivation
+![Delete GitHub Forks app showing repository filters and selection](images/app-screenshot.jpg)
 
-Deleting GitHub repositories via the GitHub interface is a hassle; you have to enter your password followed by the name of the repository. This is not scalable if you contribute to open source a fair bit and have many forked repositories that you may not necessarily want to keep.
+## Quick start
 
-Using these scripts, you can fetch a list of your GitHub repositories and delete all the unwanted repositories in one go.
-
-<!-- prettier-ignore -->
-> [!TIP]
-> If you use an AI coding agent with access to the GitHub CLI, you can run this workflow without cloning the repository. Give the agent the following prompt:
->
-> ```text
-> Use the authenticated GitHub CLI (`gh`) to find all forked repositories owned by my GitHub account, including private repositories.
->
-> First, verify that `gh` is installed and authenticated. Fetch every page of results, then show me the complete list of forks. Let me remove repositories I want to keep.
->
-> Do not delete, archive, or modify any repository until I explicitly confirm the final deletion list. After confirmation, use `gh` to delete only the confirmed repositories and report every success or failure.
-> ```
-
-## Getting Started
-
-Clone this repository.
-
-Node.js 18 or newer is required.
+You need Node.js 20.19 or newer. Run the latest published version directly from npm—no clone or global installation required:
 
 ```sh
-$ npm install
+npx delete-github-forks@latest
 ```
 
-### Option 1: GitHub CLI (recommended)
+The command:
 
-Install the [GitHub CLI](https://cli.github.com/), then authenticate and grant repository deletion access:
+1. Downloads the package temporarily through npm.
+2. Starts a local server at `http://127.0.0.1:4173`.
+3. Opens the app in your default browser.
+4. Detects your GitHub CLI authentication automatically.
+
+The server runs only on your computer and stops when you press <kbd>Ctrl</kbd> + <kbd>C</kbd>. If port 4173 is occupied, the app uses the next available port.
+
+### Command options
+
+Use a specific port:
 
 ```sh
-$ gh auth login
-$ gh auth refresh -h github.com -s delete_repo
+npx delete-github-forks@latest --port 8080
 ```
 
-The scripts will automatically use `gh api`; you do not need to create or store an access token.
-
-### Option 2: Personal access token
-
-```
-$ cp .env.example .env
-```
-
-Add your GitHub access token to `.env` as `GITHUB_TOKEN`. When this variable is present, the scripts use it instead of the GitHub CLI.
-
-- For a [personal access token (classic)](https://github.com/settings/tokens/new), grant the `repo` and `delete_repo` scopes.
-- For a [fine-grained personal access token](https://github.com/settings/personal-access-tokens/new), select the repositories to manage and grant **Metadata: Read** and **Administration: Read and write** permissions.
-
-The scripts support both public and private repositories that you own and that the token can access.
-
-## Usage
-
-Firstly, run the following command to fetch all your forked repositories.
+Start the server without opening a browser:
 
 ```sh
-$ npm run fetch # Writes to a src/repos.json file
+npx delete-github-forks@latest --no-open
 ```
 
-A JSON file, `src/repos.json` containing an array of your repositories will be written into the same directory. Manually inspect it and remove the forked repositories that you want to keep. **The repositories that remain inside `src/repos.json` will be deleted on the next command. It is an irreversible operation. Use with great caution!**.
+All options:
+
+```text
+--port <number>  Use a specific port (default: 4173, then next available)
+--no-open        Do not open the browser automatically
+-h, --help       Show command help
+```
+
+## Authentication
+
+### GitHub CLI (recommended)
+
+The app automatically detects an authenticated [GitHub CLI](https://cli.github.com/) session. Sign in and grant repository deletion access once:
 
 ```sh
-$ npm run delete # Reads from src/repos.json and deletes the repos inside it.
+gh auth login
+gh auth refresh -h github.com -s delete_repo
 ```
 
-And all the repositories within `src/repos.json` will be deleted! It's that easy.
+No access token needs to be created, copied, or stored by the app.
 
-The scripts can be potentially modified to work on an organization's repositories as well just by changing the URLs. Pull requests to support this feature are welcome.
+### Personal access token
+
+If GitHub CLI is unavailable, enter a personal access token in the local webpage. The token is sent only to the server on `127.0.0.1`, held in process memory for the current session, and never written to disk, browser storage, logs, cookies, or URLs.
+
+- Classic tokens need the `repo` and `delete_repo` scopes.
+- Fine-grained tokens need **Metadata: Read**, **Pull requests: Read**, and **Administration: Read and write** for each repository they may delete.
+
+## How it works
+
+1. The app fetches all public and private forks owned by the authenticated account.
+2. It checks every fork branch for open pull requests that still depend on it.
+3. Filter by repository name, visibility, or last activity.
+4. Select only the repositories you want to delete. Bulk selection skips forks with open pull requests or an unknown check result.
+5. Review the exact list and type `DELETE` to confirm.
+6. The app deletes repositories sequentially and reports every success or failure.
+
+Deletion is irreversible. Nothing is selected by default, and the server only accepts repositories from the list fetched during the current session.
+
+## Build and run from source
+
+If you prefer to inspect the code before running it, clone the repository and build the application locally instead of executing the published npm package:
+
+```sh
+git clone https://github.com/yangshun/delete-github-forks.git
+cd delete-github-forks
+npm install
+npm run build
+npm start
+```
+
+The app opens automatically at `http://127.0.0.1:4173`. You can also pass command options through npm:
+
+```sh
+npm start -- --no-open
+npm start -- --port 8080
+```
+
+You can also verify the source and local build before running the app:
+
+```sh
+npm run typecheck
+npm test
+npm run build
+```
+
+The frontend uses React, TypeScript, Vite, and Mona Sans. The local API uses Hono on Node.js.
 
 ## License
 

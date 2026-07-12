@@ -36,6 +36,7 @@ build/Release
 node_modules/
 jspm_packages/
 package-lock.json
+dist/
 # Typescript v1 declaration files
 typings/
 
@@ -53,9 +54,6 @@ typings/
 
 # Yarn Integrity file
 .yarn-integrity
-
-# dotenv environment variables file
-.env
 
 # Project-specific
 src/repos.json
