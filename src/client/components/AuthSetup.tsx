@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 
 import type { AppStatus } from '../../shared/types';
 
@@ -7,6 +7,40 @@ type AuthSetupProps = {
   onSubmitToken: (token: string) => Promise<void>;
   status: AppStatus;
 };
+
+function CommandBlock({ command }: { command: string }) {
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!copied) return;
+    const timeout = window.setTimeout(() => setCopied(false), 2000);
+    return () => window.clearTimeout(timeout);
+  }, [copied]);
+
+  async function copyCommand() {
+    try {
+      await navigator.clipboard.writeText(command);
+      setCopied(true);
+    } catch {
+      setCopied(false);
+    }
+  }
+
+  return (
+    <div className="command-block">
+      <pre>
+        <code>{command}</code>
+      </pre>
+      <button
+        aria-label={copied ? 'Command copied' : 'Copy command'}
+        className="command-copy"
+        onClick={() => void copyCommand()}
+        type="button">
+        {copied ? 'Copied' : 'Copy'}
+      </button>
+    </div>
+  );
+}
 
 export function AuthSetup({
   onCheckAgain,
@@ -61,9 +95,7 @@ export function AuthSetup({
                 target="_blank">
                 Install GitHub CLI
               </a>
-              <pre>
-                <code>gh auth login -h github.com -s delete_repo --web</code>
-              </pre>
+              <CommandBlock command="gh auth login -h github.com -s delete_repo --web" />
             </>
           ) : !status.gh.authenticated ? (
             <>
@@ -77,9 +109,7 @@ export function AuthSetup({
                 </a>
                 , then run:
               </p>
-              <pre>
-                <code>gh auth login -h github.com -s delete_repo --web</code>
-              </pre>
+              <CommandBlock command="gh auth login -h github.com -s delete_repo --web" />
             </>
           ) : (
             <>
@@ -94,9 +124,7 @@ export function AuthSetup({
                 </a>
                 , then run:
               </p>
-              <pre>
-                <code>gh auth refresh -h github.com -s delete_repo</code>
-              </pre>
+              <CommandBlock command="gh auth refresh -h github.com -s delete_repo" />
             </>
           )}
           <button

@@ -177,10 +177,35 @@ h1 {
 pre {
   overflow-x: auto;
   margin: 20px 0;
-  padding: 16px;
+  padding: 16px 76px 16px 16px;
   border-radius: 10px;
   color: #d9f4df;
   background: #18251c;
+}
+.command-block {
+  position: relative;
+}
+.command-copy {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  padding: 6px 9px;
+  border: 1px solid #506057;
+  border-radius: 7px;
+  color: #d9f4df;
+  background: #29382e;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transform: translateY(-50%);
+}
+.command-copy:hover {
+  background: #35463b;
+}
+.command-copy:focus-visible {
+  outline: 2px solid #9fd6ad;
+  outline-offset: 2px;
 }
 .button {
   display: inline-flex;
