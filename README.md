@@ -26,12 +26,28 @@ Clone this repository.
 
 Node.js 18 or newer is required.
 
-```
+```sh
 $ npm install
+```
+
+### Option 1: GitHub CLI (recommended)
+
+Install the [GitHub CLI](https://cli.github.com/), then authenticate and grant repository deletion access:
+
+```sh
+$ gh auth login
+$ gh auth refresh -h github.com -s delete_repo
+```
+
+The scripts will automatically use `gh api`; you do not need to create or store an access token.
+
+### Option 2: Personal access token
+
+```
 $ cp .env.example .env
 ```
 
-Add your GitHub access token to `.env` as `GITHUB_TOKEN`.
+Add your GitHub access token to `.env` as `GITHUB_TOKEN`. When this variable is present, the scripts use it instead of the GitHub CLI.
 
 - For a [personal access token (classic)](https://github.com/settings/tokens/new), grant the `repo` and `delete_repo` scopes.
 - For a [fine-grained personal access token](https://github.com/settings/personal-access-tokens/new), select the repositories to manage and grant **Metadata: Read** and **Administration: Read and write** permissions.

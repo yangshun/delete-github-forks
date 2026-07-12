@@ -1,9 +1,8 @@
 import fs from 'node:fs';
 import readline from 'node:readline';
 
-import { getConfig, githubHeaders } from './github';
+import { githubRequest } from './github';
 
-const config = getConfig();
 const reposForDeletion = JSON.parse(
   fs.readFileSync('src/repos.json', 'utf8'),
 ) as Array<string>;
@@ -13,17 +12,10 @@ async function deleteRepos(repos: Array<string>): Promise<void> {
   let failed = 0;
 
   for (const repo of repos) {
-    const url = `${config.apiUrl}/repos/${repo}`;
-
     try {
-      const response = await fetch(url, {
-        headers: githubHeaders(config.accessToken),
+      await githubRequest(`repos/${repo}`, {
         method: 'DELETE',
       });
-
-      if (!response.ok) {
-        throw new Error(`${response.status} ${response.statusText}`);
-      }
 
       deleted++;
       console.log(`${repo} deleted!`);
