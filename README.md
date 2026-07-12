@@ -28,10 +28,10 @@ Node.js 18 or newer is required.
 
 ```
 $ npm install
-$ cp src/config.json.example src/config.json
+$ cp .env.example .env
 ```
 
-Add your GitHub access token to `config.json`.
+Add your GitHub access token to `.env` as `GITHUB_TOKEN`.
 
 - For a [personal access token (classic)](https://github.com/settings/tokens/new), grant the `repo` and `delete_repo` scopes.
 - For a [fine-grained personal access token](https://github.com/settings/personal-access-tokens/new), select the repositories to manage and grant **Metadata: Read** and **Administration: Read and write** permissions.

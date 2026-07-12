@@ -1,12 +1,23 @@
-import fs from 'node:fs';
+import { config as loadEnv } from 'dotenv';
+
+loadEnv({ quiet: true });
 
 type Config = {
-  access_token: string;
-  api_url: string;
+  accessToken: string;
+  apiUrl: string;
 };
 
 export function getConfig(): Config {
-  return JSON.parse(fs.readFileSync('src/config.json', 'utf8')) as Config;
+  const accessToken = process.env.GITHUB_TOKEN;
+
+  if (accessToken == null || accessToken === '') {
+    throw new Error('GITHUB_TOKEN is required. Add it to your .env file.');
+  }
+
+  return {
+    accessToken,
+    apiUrl: process.env.GITHUB_API_URL ?? 'https://api.github.com',
+  };
 }
 
 export function githubHeaders(accessToken: string): HeadersInit {

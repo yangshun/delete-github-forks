@@ -9,7 +9,7 @@ type GitHubRepository = {
 };
 
 const config = getConfig();
-const URL = `${config.api_url}/user/repos`;
+const URL = `${config.apiUrl}/user/repos`;
 const OUT_FILE = 'src/repos.json';
 
 async function fetchRepos(url: string): Promise<Array<string>> {
@@ -26,7 +26,7 @@ async function fetchRepos(url: string): Promise<Array<string>> {
 
     try {
       const response = await fetch(`${url}?${query}`, {
-        headers: githubHeaders(config.access_token),
+        headers: githubHeaders(config.accessToken),
       });
 
       if (!response.ok) {

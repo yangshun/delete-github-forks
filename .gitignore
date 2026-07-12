@@ -58,5 +58,4 @@ typings/
 .env
 
 # Project-specific
-src/config.json
 src/repos.json

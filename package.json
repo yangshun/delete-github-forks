@@ -4,9 +4,12 @@
   "author": "Yangshun Tay",
   "description": "Delete your GitHub forks in bulk.",
   "scripts": {
-    "delete": "tsx src/deleteRepos.ts",
-    "fetch": "tsx src/fetchRepos.ts",
+    "delete": "tsx src/delete-repos.ts",
+    "fetch": "tsx src/fetch-repos.ts",
     "typecheck": "tsc"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2"
   },
   "devDependencies": {
     "@types/node": "^18.19.130",

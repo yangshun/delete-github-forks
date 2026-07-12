@@ -13,11 +13,11 @@ async function deleteRepos(repos: Array<string>): Promise<void> {
   let failed = 0;
 
   for (const repo of repos) {
-    const url = `${config.api_url}/repos/${repo}`;
+    const url = `${config.apiUrl}/repos/${repo}`;
 
     try {
       const response = await fetch(url, {
-        headers: githubHeaders(config.access_token),
+        headers: githubHeaders(config.accessToken),
         method: 'DELETE',
       });
 
