@@ -8,6 +8,18 @@ Deleting GitHub repositories via the GitHub interface is a hassle; you have to e
 
 Using these scripts, you can fetch a list of your GitHub repositories and delete all the unwanted repositories in one go.
 
+<!-- prettier-ignore -->
+> [!TIP]
+> If you use an AI coding agent with access to the GitHub CLI, you can run this workflow without cloning the repository. Give the agent the following prompt:
+>
+> ```text
+> Use the authenticated GitHub CLI (`gh`) to find all forked repositories owned by my GitHub account, including private repositories.
+>
+> First, verify that `gh` is installed and authenticated. Fetch every page of results, then show me the complete list of forks. Let me remove repositories I want to keep.
+>
+> Do not delete, archive, or modify any repository until I explicitly confirm the final deletion list. After confirmation, use `gh` to delete only the confirmed repositories and report every success or failure.
+> ```
+
 ## Getting Started
 
 Clone this repository.
