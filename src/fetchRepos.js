@@ -4,8 +4,7 @@ const path = require('path');
 
 const config = require('./config');
 
-const username = config.github_username;
-const URL = `${config.api_url}/users/${username}/repos`;
+const URL = `${config.api_url}/user/repos`;
 const OUT_FILE = 'src/repos.json';
 
 async function fetchRepos(url) {
@@ -20,7 +19,10 @@ async function fetchRepos(url) {
           Authorization: `token ${config.access_token}`,
         },
         params: {
+          affiliation: 'owner',
           page,
+          per_page: 100,
+          visibility: 'all',
         },
       });
 
