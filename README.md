@@ -12,6 +12,8 @@ Using these scripts, you can fetch a list of your GitHub repositories and delete
 
 Clone this repository.
 
+Node.js 18 or newer is required.
+
 ```
 $ npm install
 $ cp src/config.json.example src/config.json

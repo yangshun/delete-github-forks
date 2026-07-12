@@ -1,29 +1,35 @@
-const axios = require('axios');
-const config = require('./config');
-const readline = require('readline');
+import fs from 'node:fs';
+import readline from 'node:readline';
 
-const reposForDeletion = require('./repos');
+import { getConfig, githubHeaders } from './github';
 
-async function deleteRepos(repos) {
+const config = getConfig();
+const reposForDeletion = JSON.parse(
+  fs.readFileSync('src/repos.json', 'utf8'),
+) as Array<string>;
+
+async function deleteRepos(repos: Array<string>): Promise<void> {
   let deleted = 0;
   let failed = 0;
 
-  for (let i = 0; i < repos.length; i++) {
-    const repo = repos[i];
-    const URL = `${config.api_url}/repos/${repo}`;
+  for (const repo of repos) {
+    const url = `${config.api_url}/repos/${repo}`;
 
     try {
-      await axios.delete(URL, {
-        headers: {
-          Accept: 'application/vnd.github.v3+json',
-          Authorization: `token ${config.access_token}`,
-        },
+      const response = await fetch(url, {
+        headers: githubHeaders(config.access_token),
+        method: 'DELETE',
       });
+
+      if (!response.ok) {
+        throw new Error(`${response.status} ${response.statusText}`);
+      }
+
       deleted++;
       console.log(`${repo} deleted!`);
-    } catch (err) {
+    } catch (error) {
       failed++;
-      console.error(`Error deleting ${repo}`);
+      console.error(`Error deleting ${repo}: ${String(error)}`);
     }
   }
 
@@ -47,12 +53,11 @@ console.log(reposForDeletion.map((repo) => `- ${repo}`).join('\n'));
 console.log();
 console.log('Are you sure you want to delete the following repos? y/n');
 
-rl.on('line', async function (line) {
+rl.on('line', async (line) => {
   if (line.trim().toLowerCase() === 'y') {
     console.log();
     await deleteRepos(reposForDeletion);
   }
 
-  // Terminate the process.
   rl.close();
 });
