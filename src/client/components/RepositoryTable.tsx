@@ -17,6 +17,18 @@ function formatDate(value: string | null): string {
   );
 }
 
+function forkStatusDetails(repository: Repository): Array<string> {
+  const details: Array<string> = [];
+  if ((repository.aheadBy ?? 0) > 0) {
+    details.push(`↑ ${repository.aheadBy} ahead`);
+  }
+  if ((repository.extraBranchCount ?? 0) > 0) {
+    const count = repository.extraBranchCount;
+    details.push(`${count} other branch${count === 1 ? '' : 'es'}`);
+  }
+  return details;
+}
+
 export function RepositoryTable({
   allVisibleSelected,
   loading,
@@ -68,6 +80,7 @@ export function RepositoryTable({
             <th>Repository</th>
             <th>Visibility</th>
             <th>Open PRs</th>
+            <th>Fork status</th>
             <th>Last pushed</th>
           </tr>
         </thead>
@@ -130,6 +143,29 @@ export function RepositoryTable({
                           {index + 1}
                         </a>
                       ))}
+                  </span>
+                )}
+              </td>
+              <td>
+                {repository.forkStatus === 'loading' ? (
+                  <span
+                    aria-label="Checking whether the fork is ahead of upstream"
+                    className="pr-loading">
+                    <span
+                      aria-hidden="true"
+                      className="spinner spinner-small"
+                    />
+                    Checking
+                  </span>
+                ) : repository.forkStatus === 'unavailable' ? (
+                  <span className="pr-status pr-status-unknown">Unknown</span>
+                ) : forkStatusDetails(repository).length === 0 ? (
+                  <span className="muted">In sync</span>
+                ) : (
+                  <span
+                    className="pr-status-ahead"
+                    title={forkStatusDetails(repository).join(', ')}>
+                    {forkStatusDetails(repository).join(', ')}
                   </span>
                 )}
               </td>
