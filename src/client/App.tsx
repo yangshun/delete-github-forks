@@ -53,6 +53,7 @@ export function App() {
         } catch {
           updates = batch.map((repository) => ({
             ...repository,
+            forkStatus: 'unavailable' as const,
             pullRequestStatus: 'unavailable' as const,
           }));
         }
@@ -123,7 +124,10 @@ export function App() {
   const bulkSelectableRepositories = filteredRepositories.filter(
     (repository) =>
       repository.pullRequestStatus === 'loaded' &&
-      repository.openPullRequestCount === 0,
+      repository.openPullRequestCount === 0 &&
+      repository.forkStatus === 'loaded' &&
+      (repository.aheadBy ?? 0) === 0 &&
+      (repository.extraBranchCount ?? 0) === 0,
   );
   const allVisibleSelected =
     bulkSelectableRepositories.length > 0 &&

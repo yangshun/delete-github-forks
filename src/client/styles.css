@@ -398,6 +398,11 @@ input[type='checkbox'] {
 .pr-status-unknown {
   color: #87651f;
 }
+.pr-status-ahead {
+  color: #9a5c1f;
+  font-size: 0.82rem;
+  font-weight: 500;
+}
 .pr-loading {
   display: inline-flex;
   align-items: center;
