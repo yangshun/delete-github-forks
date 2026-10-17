@@ -6,7 +6,10 @@ import { filterRepositories } from './filter-repositories';
 const now = new Date('2026-07-12T00:00:00Z').getTime();
 const repositories: Array<Repository> = [
   {
+    aheadBy: 0,
     archived: false,
+    extraBranchCount: 0,
+    forkStatus: 'loaded',
     fullName: 'octocat/recent-public',
     openPullRequestCount: 0,
     openPullRequests: [],
@@ -16,7 +19,10 @@ const repositories: Array<Repository> = [
     url: 'https://github.com/octocat/recent-public',
   },
   {
+    aheadBy: 0,
     archived: true,
+    extraBranchCount: 0,
+    forkStatus: 'loaded',
     fullName: 'octocat/old-private',
     openPullRequestCount: 1,
     openPullRequests: [

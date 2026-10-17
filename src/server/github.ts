@@ -31,11 +31,26 @@ type RefPage = {
       nodes: Array<PullRequestSummary>;
       totalCount: number;
     };
+    name: string;
   }>;
   pageInfo: {
     endCursor: string | null;
     hasNextPage: boolean;
   };
+};
+
+type BranchRef = {
+  name: string;
+  target: { oid: string } | null;
+} | null;
+
+type RepositoryDetails = {
+  defaultBranchRef: BranchRef;
+  parent: {
+    defaultBranchRef: BranchRef;
+    nameWithOwner: string;
+  } | null;
+  refs: RefPage;
 };
 
 type GraphQLResponse<T> = {
@@ -47,6 +62,11 @@ export type GraphQLExecutor = <T>(
   query: string,
   variables: Record<string, string>,
 ) => Promise<GraphQLResponse<T>>;
+
+export type CompareExecutor = (
+  fullName: string,
+  basehead: string,
+) => Promise<{ aheadBy: number }>;
 
 type GhAuthPayload = {
   hosts?: Record<
@@ -200,7 +220,10 @@ export async function validateToken(token: string): Promise<string> {
 
 function normalizeRepository(repo: GitHubApiRepository): Repository {
   return {
+    aheadBy: null,
     archived: repo.archived,
+    extraBranchCount: null,
+    forkStatus: 'loading',
     fullName: repo.full_name,
     openPullRequestCount: null,
     openPullRequests: [],
@@ -215,6 +238,7 @@ function refSelection(afterVariable?: string): string {
   const after = afterVariable == null ? '' : `, after: $${afterVariable}`;
   return `refs(refPrefix: "refs/heads/", first: 100${after}) {
     nodes {
+      name
       associatedPullRequests(states: [OPEN], first: 10) {
         totalCount
         nodes { title url }
@@ -224,7 +248,66 @@ function refSelection(afterVariable?: string): string {
   }`;
 }
 
-function applyRefPage(repository: Repository, page: RefPage): void {
+function branchRefSelection(): string {
+  return `name target { ... on Commit { oid } }`;
+}
+
+function forkStatusSelection(): string {
+  return `defaultBranchRef { ${branchRefSelection()} }
+  parent {
+    nameWithOwner
+    defaultBranchRef { ${branchRefSelection()} }
+  }`;
+}
+
+function compareBasehead(
+  parent: { defaultBranchRef: BranchRef; nameWithOwner: string },
+  forkBranch: string,
+): string | null {
+  if (parent.defaultBranchRef?.name == null) return null;
+  const [parentOwner, parentName] = parent.nameWithOwner.split('/', 2);
+  return `${parentOwner}:${parentName}:${parent.defaultBranchRef.name}...${forkBranch}`;
+}
+
+async function applyForkStatus(
+  repository: Repository,
+  details: RepositoryDetails | null,
+  compare: CompareExecutor,
+): Promise<void> {
+  const forkBranch = details?.defaultBranchRef;
+  const parent = details?.parent;
+
+  if (forkBranch?.target == null || parent?.defaultBranchRef?.target == null) {
+    repository.forkStatus = 'unavailable';
+    return;
+  }
+
+  if (forkBranch.target.oid === parent.defaultBranchRef.target.oid) {
+    repository.aheadBy = 0;
+    repository.forkStatus = 'loaded';
+    return;
+  }
+
+  const basehead = compareBasehead(parent, forkBranch.name);
+  if (basehead == null) {
+    repository.forkStatus = 'unavailable';
+    return;
+  }
+
+  try {
+    const result = await compare(repository.fullName, basehead);
+    repository.aheadBy = result.aheadBy;
+    repository.forkStatus = 'loaded';
+  } catch {
+    repository.forkStatus = 'unavailable';
+  }
+}
+
+function applyRefPage(
+  repository: Repository,
+  page: RefPage,
+  defaultBranchName: string | null,
+): void {
   const pullRequests = new Map(
     repository.openPullRequests.map((pullRequest) => [
       pullRequest.url,
@@ -232,20 +315,26 @@ function applyRefPage(repository: Repository, page: RefPage): void {
     ]),
   );
   let count = repository.openPullRequestCount ?? 0;
+  let extraBranches = repository.extraBranchCount ?? 0;
   for (const ref of page.nodes) {
     count += ref.associatedPullRequests.totalCount;
     for (const pullRequest of ref.associatedPullRequests.nodes) {
       pullRequests.set(pullRequest.url, pullRequest);
     }
+    if (defaultBranchName != null && ref.name !== defaultBranchName) {
+      extraBranches += 1;
+    }
   }
   repository.openPullRequestCount = count;
   repository.openPullRequests = [...pullRequests.values()];
   repository.pullRequestStatus = 'loaded';
+  if (defaultBranchName != null) repository.extraBranchCount = extraBranches;
 }
 
 export async function enrichPullRequests(
   repositories: Array<Repository>,
   executeGraphQL: GraphQLExecutor,
+  compare: CompareExecutor,
 ): Promise<Array<Repository>> {
   const batchSize = 10;
 
@@ -259,24 +348,35 @@ export async function enrichPullRequests(
       const [owner, name] = repository.fullName.split('/', 2);
       declarations.push(`$owner${index}: String!`, `$name${index}: String!`);
       fields.push(
-        `r${index}: repository(owner: $owner${index}, name: $name${index}) { ${refSelection()} }`,
+        `r${index}: repository(owner: $owner${index}, name: $name${index}) { ${forkStatusSelection()} ${refSelection()} }`,
       );
       variables[`owner${index}`] = owner;
       variables[`name${index}`] = name;
     });
 
     const response = await executeGraphQL<
-      Record<string, { refs: RefPage } | null>
+      Record<string, RepositoryDetails | null>
     >(`query(${declarations.join(', ')}) { ${fields.join('\n')} }`, variables);
 
     batch.forEach((repository, index) => {
       const result = response.data?.[`r${index}`];
-      if (result != null) applyRefPage(repository, result.refs);
-      else repository.pullRequestStatus = 'unavailable';
+      if (result != null) {
+        applyRefPage(repository, result.refs, result.defaultBranchRef?.name ?? null);
+      } else {
+        repository.pullRequestStatus = 'unavailable';
+      }
     });
+
+    await Promise.all(
+      batch.map((repository, index) =>
+        applyForkStatus(repository, response.data?.[`r${index}`] ?? null, compare),
+      ),
+    );
 
     for (let index = 0; index < batch.length; index++) {
       const repository = batch[index];
+      const defaultBranchName =
+        response.data?.[`r${index}`]?.defaultBranchRef?.name ?? null;
       let page = response.data?.[`r${index}`]?.refs;
       while (page?.pageInfo.hasNextPage && page.pageInfo.endCursor != null) {
         const [owner, name] = repository.fullName.split('/', 2);
@@ -289,7 +389,7 @@ export async function enrichPullRequests(
           { after: page.pageInfo.endCursor, name, owner },
         );
         page = next.data?.repository?.refs;
-        if (page != null) applyRefPage(repository, page);
+        if (page != null) applyRefPage(repository, page, defaultBranchName);
       }
     }
   }
@@ -374,18 +474,49 @@ export async function listForksWithToken(
   return repositories.filter((repo) => repo.fork).map(normalizeRepository);
 }
 
+async function compareWithGh(
+  fullName: string,
+  basehead: string,
+): Promise<{ aheadBy: number }> {
+  const { stdout } = await exec('gh', [
+    'api',
+    `repos/${fullName}/compare/${basehead}`,
+  ]);
+  const payload = JSON.parse(stdout) as { ahead_by: number };
+  return { aheadBy: payload.ahead_by };
+}
+
+async function compareWithToken(
+  token: string,
+  fullName: string,
+  basehead: string,
+): Promise<{ aheadBy: number }> {
+  const response = await fetchWithToken(
+    token,
+    `repos/${fullName}/compare/${basehead}`,
+  );
+  const payload = (await response.json()) as { ahead_by: number };
+  return { aheadBy: payload.ahead_by };
+}
+
 export async function checkPullRequestsWithGh(
   repositories: Array<Repository>,
 ): Promise<Array<Repository>> {
-  return await enrichPullRequests(repositories, graphQLWithGh);
+  return await enrichPullRequests(
+    repositories,
+    graphQLWithGh,
+    compareWithGh,
+  );
 }
 
 export async function checkPullRequestsWithToken(
   token: string,
   repositories: Array<Repository>,
 ): Promise<Array<Repository>> {
-  return await enrichPullRequests(repositories, (query, variables) =>
-    graphQLWithToken(token, query, variables),
+  return await enrichPullRequests(
+    repositories,
+    (query, variables) => graphQLWithToken(token, query, variables),
+    (fullName, basehead) => compareWithToken(token, fullName, basehead),
   );
 }
 

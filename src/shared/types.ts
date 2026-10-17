@@ -15,7 +15,10 @@ export type AppStatus = {
 };
 
 export type Repository = {
+  aheadBy: number | null;
   archived: boolean;
+  extraBranchCount: number | null;
+  forkStatus: 'loading' | 'loaded' | 'unavailable';
   fullName: string;
   openPullRequestCount: number | null;
   openPullRequests: Array<{

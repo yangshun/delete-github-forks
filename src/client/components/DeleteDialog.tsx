@@ -11,6 +11,29 @@ type DeleteDialogProps = {
   results: Array<DeleteResult>;
 };
 
+function protectionReason(repository: Repository): string {
+  const reasons: Array<string> = [];
+
+  if (repository.pullRequestStatus !== 'loaded') {
+    reasons.push('PR status unknown');
+  } else if ((repository.openPullRequestCount ?? 0) > 0) {
+    reasons.push(`${repository.openPullRequestCount} open PR(s)`);
+  }
+
+  if (repository.forkStatus !== 'loaded') {
+    reasons.push('fork status unknown');
+  } else {
+    if ((repository.aheadBy ?? 0) > 0) {
+      reasons.push(`${repository.aheadBy} commit(s) ahead of upstream`);
+    }
+    if ((repository.extraBranchCount ?? 0) > 0) {
+      reasons.push(`${repository.extraBranchCount} other branch(es)`);
+    }
+  }
+
+  return reasons.join(', ');
+}
+
 export function DeleteDialog({
   deleting,
   onClose,
@@ -24,7 +47,10 @@ export function DeleteDialog({
   const protectedRepositories = repositories.filter(
     (repository) =>
       repository.pullRequestStatus !== 'loaded' ||
-      (repository.openPullRequestCount ?? 0) > 0,
+      (repository.openPullRequestCount ?? 0) > 0 ||
+      repository.forkStatus !== 'loaded' ||
+      (repository.aheadBy ?? 0) > 0 ||
+      (repository.extraBranchCount ?? 0) > 0,
   );
 
   return (
@@ -82,18 +108,17 @@ export function DeleteDialog({
             </ul>
             {protectedRepositories.length > 0 ? (
               <div className="pr-warning" role="alert">
-                <strong>Open pull request warning</strong>
+                <strong>Unsafe to delete</strong>
                 <p>
-                  These forks have open pull requests or could not be checked.
-                  Deleting them may disrupt active contributions.
+                  These forks have open pull requests, commits or branches
+                  that haven&rsquo;t been merged upstream, or could not be
+                  checked. Deleting them may disrupt active contributions or
+                  discard unmerged work.
                 </p>
                 <ul>
                   {protectedRepositories.map((repository) => (
                     <li key={repository.fullName}>
-                      {repository.fullName}:{' '}
-                      {repository.pullRequestStatus !== 'loaded'
-                        ? 'status unknown'
-                        : `${repository.openPullRequestCount} open`}
+                      {repository.fullName}: {protectionReason(repository)}
                     </li>
                   ))}
                 </ul>
